@@ -2,6 +2,8 @@ import React from 'react';
 import assets from '../assets/assets';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { toast } from "react-hot-toast";  
+
 
 const LoginPage = () => {
   const [currState, setCurrState] = useState("Sign up");
@@ -10,18 +12,28 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
-  const { login } = useContext(AuthContext);
+  const { login,otpSender } = useContext(AuthContext);
+  const [generatedOtp,setGeneratedOtp]= useState("")
+  const [enteredOtp, setEnteredOtp] = useState("");
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-
-    if (currState === 'Sign up' && !isDataSubmitted) {
+    if ( (currState === 'Sign up' || currState === 'Login') && !isDataSubmitted) {
       setIsDataSubmitted(true);
+      let otp = await otpSender(email);
+      setGeneratedOtp(otp);
       return;
     }
 
-    //CALLING LOGIN FUNCTION PRESENT IN THE AUTHCONTEXT
-    login(currState === "Sign up" ? "signup" : "login", currState === "Sign up" ? { fullName, email, password, bio } : { email, password });
+    if ( generatedOtp == enteredOtp){
+      //CALLING LOGIN FUNCTION PRESENT IN THE AUTHCONTEXT
+      login(currState === "Sign up" ? "signup" : "login", currState === "Sign up" ? { fullName, email, password, bio } : { email, password });
+    }
+    else{
+      toast.error("You Entered a Wrong otp");
+    }
+
+
   };
 
   return (
@@ -35,7 +47,7 @@ const LoginPage = () => {
         <h2 className='flex justify-between items-center text-2xl font-medium'>
           {currState}
           {isDataSubmitted && (
-             <img src={assets.arrow_icon} alt="" className='w-5 cursor-pointer' onClick={() => setIsDataSubmitted(false)} /> 
+            <img src={assets.arrow_icon} alt="" className='w-5 cursor-pointer' onClick={() => setIsDataSubmitted(false)} />
           )}
         </h2>
 
@@ -47,7 +59,7 @@ const LoginPage = () => {
             type="text"
             className='p-2 border border-gray-500 rounded-md focus:outline-none'
             placeholder='Full Name'
-            required/>
+            required />
         )}
 
         {/* EMAIL INPUT */}
@@ -58,7 +70,7 @@ const LoginPage = () => {
             type="email"
             placeholder='Email Address'
             required
-            className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'/>
+            className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500' />
         )}
 
         {/* PASSWORD INPUT */}
@@ -69,17 +81,28 @@ const LoginPage = () => {
             type="password"
             placeholder='Password'
             required
-            className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'/>
+            className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500' />
         )}
 
         {/* BIO INPUT */}
-        {currState === "Sign up" && isDataSubmitted && (
+        {currState === "Sign up" && !isDataSubmitted && (
           <textarea
             onChange={(e) => setBio(e.target.value)}
             value={bio}
-            rows={4}
+            rows={2}
             className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'
             placeholder='Provide a short bio...'
+            required />
+        )}
+
+        {/* {OTP FIELD} */}
+        { (currState === "Sign up" || currState === "Login") && isDataSubmitted && (
+          <textarea
+            onChange={(e) => setEnteredOtp(e.target.value)}
+            value={enteredOtp}
+            rows={2}
+            className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'
+            placeholder='Enter otp send to your email'
             required />
         )}
 

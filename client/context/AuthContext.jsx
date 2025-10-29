@@ -26,6 +26,18 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  //LOGIN OTP GENERATOR
+  const otpSender = async (email)=>{
+    const { data } = await axios.post("/api/auth/otp",{email});
+    if (data.success){
+      toast.success(data.message);
+      return data.otp;
+    }else{
+      toast.error(data.message);
+      return data.otp;
+    }
+  }
+
   //LOGIN FUNCTION TO HANDLE USER AUTHENTICATION AND SOCKET CONNECTION
   const login = async (state, credentials) => {
     try {
@@ -100,7 +112,8 @@ export const AuthProvider = ({ children }) => {
     socket,
     login,
     logout,
-    updateProfile
+    updateProfile,
+    otpSender
   }
 
   return (

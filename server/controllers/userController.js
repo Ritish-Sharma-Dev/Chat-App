@@ -2,6 +2,8 @@ import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
+
 
 //SIGNUP A NEW USER
 export const signUp = async (req, res) => {
@@ -63,5 +65,31 @@ export const updateProfile = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.json({ success: false, message: error.message });
+    }
+}
+
+//OTP GENERATOR AND SENDER
+export const otpSender = async (req, res) => {
+    try {
+        console.log('backend working');
+        const { email } = req.body;
+        let generatedOtp = Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_USER,
+                pass: process.env.GMAIL_PASS, // App password (not normal Gmail password)
+            },
+        });
+        await transporter.sendMail({
+            from: process.env.GMAIL_USER,
+            to: email,
+            subject: "Your OTP Code",
+            text: `Your OTP is ${generatedOtp}. It will expire in 5 minutes.`,
+        });
+    
+        res.json({ success: true, otp: generatedOtp,  message: "OTP sent to Gmail"});
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to send OTP" });
     }
 }
