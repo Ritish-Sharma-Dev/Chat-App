@@ -20,7 +20,9 @@ const LoginPage = () => {
     e.preventDefault();
     if ( (currState === 'Sign up' || currState === 'Login') && !isDataSubmitted) {
       setIsDataSubmitted(true);
+      console.log("yaha tak chala");
       let otp = await otpSender(email);
+      console.log(otp);
       setGeneratedOtp(otp);
       return;
     }
@@ -32,8 +34,6 @@ const LoginPage = () => {
     else{
       toast.error("You Entered a Wrong otp");
     }
-
-
   };
 
   return (
@@ -107,7 +107,9 @@ const LoginPage = () => {
         )}
 
         {/* SUBMIT BUTTON */}
-        <button type='submit' className='py-3 bg-gradient-to-r from-purple-400 to-violet-600 text-white rounded-md cursor-pointer'>
+        <button 
+        type='submit' 
+        className='py-3 bg-gradient-to-r from-purple-400 to-violet-600 text-white rounded-md cursor-pointer'>
           {currState === "Sign up" ? "Create Account" : "Login Now"}
         </button>
 

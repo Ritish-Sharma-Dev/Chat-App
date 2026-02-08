@@ -4,7 +4,6 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 
-
 //SIGNUP A NEW USER
 export const signUp = async (req, res) => {
     const { fullName, email, password, bio } = req.body;
@@ -73,6 +72,7 @@ export const otpSender = async (req, res) => {
     try {
         console.log('backend working');
         const { email } = req.body;
+        console.log("Sending OTP to:", email); // Debug log
         let generatedOtp = Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
         const transporter = nodemailer.createTransport({
             service: "gmail",
@@ -87,9 +87,10 @@ export const otpSender = async (req, res) => {
             subject: "Your OTP Code",
             text: `Your OTP is ${generatedOtp}. It will expire in 5 minutes.`,
         });
-    
+
         res.json({ success: true, otp: generatedOtp,  message: "OTP sent to Gmail"});
     } catch (error) {
+        console.error("OTP Send Error:", error); // Detailed error log
         res.status(500).json({ success: false, message: "Failed to send OTP" });
     }
 }

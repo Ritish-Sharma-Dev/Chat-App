@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
 
   //LOGIN OTP GENERATOR
   const otpSender = async (email)=>{
+    console.log("otp sender chala");
     const { data } = await axios.post("/api/auth/otp",{email});
     if (data.success){
       toast.success(data.message);
